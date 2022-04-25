@@ -1,0 +1,18 @@
+ SET @sql = NULL;
+    SELECT GROUP_CONCAT(DISTINCT
+    CONCAT(
+    'max(case when field_key = ''',
+    field_key,
+    ''' then field_value end) ',
+    field_key
+    )
+    ) INTO @sql
+    FROM
+    data_translation WHERE `table_name`='categories';
+    SET @sql = CONCAT('SELECT categories.*,`refrence_id`, ', @sql, ' 
+    FROM data_translation
+    JOIN categories on categories.id=data_translation.refrence_id
+    GROUP BY refrence_id');
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt; 
+    DEALLOCATE PREPARE stmt;
